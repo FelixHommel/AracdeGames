@@ -8,6 +8,10 @@
 #include <SFML/Network.hpp>
 
 #include <iostream>
+#include <vector>
+#include <algorithm>
+
+#include "include/DEFINITION.h"
 
 class stdafx
 {

@@ -1,6 +1,6 @@
-#include "../include/stdafx.h"
+#include "stdafx.h"
 
-#include "../include/Game.h"
+#include "include/Game.h"
 
 int main()
 {
