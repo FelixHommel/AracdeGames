@@ -3,16 +3,20 @@
 
 Game::Game()
 {
-	m_window = new sf::RenderWindow(sf::VideoMode(static_cast<unsigned int>(WINDOW_WIDTH), static_cast<unsigned int>(WINDOW_HEIGHT)), "Space Invaders", sf::Style::Default);
+	m_window = new sf::RenderWindow(sf::VideoMode(WINDOW::WIDTH, WINDOW::HEIGHT), "Space Invaders", sf::Style::Default);
 	gameClock.restart();
 
+	initFont();
 	initEnemies();
+	m_menu = new Menu(m_font);
 }
 
 Game::~Game()
 {
 	for (auto& i : m_enemies)
 		delete i;
+
+	delete m_menu;
 
 	delete m_window;
 }
@@ -31,7 +35,7 @@ void Game::checkBulletHit()
 	for (size_t e{ 0 }; e < m_enemies.size(); ++e)
 		for (size_t b{ 0 }; b < m_player.getAmountOfBullets(); ++b)
 		{
-			if (m_enemies[e]->getGlobalBounds().intersects(m_player.getSingleBullet(b)))
+			if (m_enemies.at(e)->getGlobalBounds().intersects(m_player.getSingleBullet(b)))
 			{
 				m_player.removeBullet(b);
 				m_enemies.erase(m_enemies.begin() + e);
@@ -43,6 +47,24 @@ void Game::checkBulletHit()
 }
 
 void Game::moveEnemies()
+{
+}
+
+void Game::menuUpdate(const float deltaTime)
+{
+	m_menu->update(deltaTime, sf::Mouse::getPosition(*m_window));
+	if (m_menu->exitMenu())
+		m_currentGameState = GAME_STATE::PLAYING;
+}
+
+void Game::playingUpdate(const float deltaTime)
+{
+	m_player.update(deltaTime);
+	checkBulletHit();
+	moveEnemies();
+}
+
+void Game::pausedUpdate()
 {
 }
 
@@ -63,6 +85,14 @@ void Game::masterUpdate()
 			case sf::Keyboard::Escape:
 				m_window->close();
 				break;
+#ifdef _DEBUG
+			case sf::Keyboard::Up:
+				m_currentGameState = GAME_STATE::PLAYING;
+				break;
+			case sf::Keyboard::Down:
+				m_currentGameState = GAME_STATE::MENU;
+				break;
+#endif
 			}
 			break;
 		}
@@ -70,22 +100,69 @@ void Game::masterUpdate()
 	//Game logic update
 	float deltaTime{ gameClock.restart().asSeconds() };
 
-	m_player.update(deltaTime);
-	//m_enemies.update(deltaTime, m_player.getBullets());
-	checkBulletHit();
-	moveEnemies();
+	switch (m_currentGameState)
+	{
+	case GAME_STATE::MENU:
+		menuUpdate(deltaTime);
+		break;
+	case GAME_STATE::PLAYING:
+		playingUpdate(deltaTime);
+		break;
+	case GAME_STATE::PAUSED:
+		//Implement later
+		pausedUpdate();
+		exit(0);
+		break;
+	}
+}
+
+void Game::menuRender()
+{
+	m_menu->render(*m_window);
+}
+
+void Game::playingRender()
+{
+	m_player.render(*m_window);
+	for (auto& i : m_enemies)
+		i->render(*m_window);
+}
+
+void Game::pausedRender()
+{
 }
 
 void Game::masterRender()
 {
 	m_window->clear(sf::Color::Black);
 
-	m_player.render(*m_window);
-	//m_enemies.render(*m_window);
-	for (auto& i : m_enemies)
-		i->render(*m_window);
+	switch (m_currentGameState)
+	{
+	case GAME_STATE::MENU:
+		menuRender();
+		break;
+	case GAME_STATE::PLAYING:
+		playingRender();
+		break;
+	case GAME_STATE::PAUSED:
+		//Implement later
+		pausedRender();
+		exit(0);
+		break;
+	}
 
 	m_window->display();
+}
+
+void Game::initFont()
+{
+	m_font = new sf::Font();
+	if (!m_font->loadFromFile("Resources/Fonts/PixellettersFull.ttf"))
+	{
+		//implement better error handling later
+		std::cerr << "Unable to load ../Resources/Fonts/PixellettersFull.ttf" << std::endl;
+		m_window->close();
+	}
 }
 
 void Game::initEnemies()

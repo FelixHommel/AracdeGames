@@ -151,6 +151,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\GUI.cpp" />
+    <ClCompile Include="src\Menu.cpp" />
     <ClCompile Include="src\Enemy.cpp" />
     <ClCompile Include="src\Player.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../stdafx.h</PrecompiledHeaderFile>
@@ -182,9 +184,11 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\GUI.h" />
     <ClInclude Include="include\Enemy.h" />
     <ClInclude Include="include\DEFINITION.h" />
     <ClInclude Include="include\Game.h" />
+    <ClInclude Include="include\Menu.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="include\Player.h" />
   </ItemGroup>

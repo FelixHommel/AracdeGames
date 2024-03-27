@@ -14,8 +14,8 @@ public:
 	Enemy(const sf::Texture& texture, const sf::Vector2f pos);
 	~Enemy();
 
-	//Accessor
-	inline const sf::FloatRect getGlobalBounds() const { return  m_enemy.getGlobalBounds(); }
+	//Accessor          
+	inline const sf::FloatRect& getGlobalBounds() const { return  m_enemy.getGlobalBounds(); }
 
 	//Modefier
 	void move(const float deltaTime, MOVE_DIRECTION direction);
